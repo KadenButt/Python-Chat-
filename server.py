@@ -1,16 +1,39 @@
-# This is a sample Python script.
+import socket
+import threading
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+HEADER = 64
+PORT = 5050
+SERVER = socket.gethostbyname(socket.gethostname())
+ADDR = (SERVER, PORT)
+FORMAT = "utf-8"
+DISCONNET_MESSAGE = "!DISCONNECT"
 
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(ADDR)
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+def handle_client(conn,addr):
+    print(f"[NEW CONNECTION] {addr} connected")
+    connected = True
+    while connected:
+        msg_length = conn.recv(HEADER).decode(FORMAT)
+        if msg_length: ##if msg == not non
+            msg_length = int(msg_length)
+            msg = conn.recv(msg_length).decode(FORMAT)
+            if msg == DISCONNET_MESSAGE:
+                connection = False
+            print(f"[{addr}] {msg}")
+            conn.send("MSG received".encode(FORMAT))
+            conn.close()
 
+def start():
+    server.listen()
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+    print(f"[LISTENING] Server is listening on {SERVER}")
+    while True:
+        conn, addr = server.accept()
+        thread = threading.Thread(target=handle_client, args=(conn,addr))
+        thread.start()
+        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() -1}")
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+print(f"[STARTING] server is starting")
+start()
