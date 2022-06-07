@@ -3,7 +3,8 @@ import socket
 
 HEADER = 64
 PORT = 5050
-SERVER = "127.0.1.1"
+##SERVER = "127.0.1.1"
+SERVER = "192.168.1.165"
 FORMAT = "utf-8"
 DISCONNET_MESSAGE = "!DISCONNECT"
 ADDR = (SERVER, PORT)
@@ -20,6 +21,9 @@ def send(msg):
     client.send(message)
     print(client.recv(20480).decode(FORMAT))
 
-send("Hello")
-
-send(DISCONNET_MESSAGE)
+while True:
+    message = input("user: ")
+    send(message)
+    if message == "EXIT":
+        send(DISCONNET_MESSAGE)
+        exit("[CONNECTION STATUS] disconnected")
