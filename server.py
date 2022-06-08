@@ -16,30 +16,54 @@ g_msg_ip = []
 g_recived_msg = []
 connected_devices = []
 
-def remove_seen_msg(g_msg_seen, device_connected):
-    for x  in g_msg_seen[:]:
-        if len(x) == device_connected:
-            g_msg_seen.remove(x)
-    return g_msg_seen
+def remove_seen_msg():
+    global g_msg
+    global g_msg_ip
+    global g_recived_msg
+    i=0
+
+    msg_ip_delete = []
+    msg_delete = []
+
+
+    ##deletes g_recived_msg and get locations to be deleted
+    for x in g_recived_msg[:]:
+        if len(x) == len(connected_devices):
+            g_recived_msg.remove(x)
+            msg_delete.append(g_msg[i])
+            msg_ip_delete.append(g_msg_ip[i])
+        i += 1
+    ##deletes msg_ip_delete
+    for x in msg_ip_delete[:]:
+        g_msg_ip.remove(x)
+
+    ##deletes msg_delete
+    for x in msg_delete[:]:
+        g_msg.remove(x)
 
 def send_all(ip):
     i =0
+    l_msg = g_msg[:]
     msg_delete = []
-    l_msg_ip = g_msg_ip
+
     ##finds messages for deletion
-    for x in l_msg_ip[:]:
-        ##mesages that user has sent them selfs for one they have already seen
-        if x == ip or ip in g_recived_msg[i]:
-            msg_delete.append(g_recived_msg[i])
+    for x in g_msg_ip[:]:
+        ##mesages that user has sent them selfs they also get mark as seen
+        if x == ip:
+            msg_delete.append(l_msg[i])
+            g_recived_msg[g_msg_ip.index(x)].append(ip)
+        ##the messages the user has already seen
+        elif ip in g_recived_msg[i]:
+            msg_delete.append(l_msg[i])
+        ##deletes
         else:
             g_recived_msg[i].append(ip)
+
         i += 1
     ##deletes the messages
-    for x in msg_delete[:]:
-        l_msg_ip.remove(x)
-    return(l_msg_ip)
-
-
+    for x in msg_delete:
+        l_msg.remove(x)
+    return l_msg
 
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
@@ -71,9 +95,11 @@ def handle_client(conn, addr):
                 connected_devices.remove(addr[0])
                 print(connected_devices)
                 connected = False
-
-            print(f"[{addr}] {msg}")
-            conn.send("Msg received".encode(FORMAT))
+            for x in send_all(addr[0]):
+                conn.send(x.encode(FORMAT))
+            ##remove_seen_msg()
+            ##print(f"[{addr}] {msg}")
+            ##conn.send("Msg received".encode(FORMAT))
 
     conn.close()
 
