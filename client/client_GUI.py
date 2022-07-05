@@ -46,6 +46,9 @@ def display_reviced_text(screen):
             chat_list.pop(1)
         screen.config(text=" ".join(chat_list))
 
+def test(msg_input):
+    thread2 = threading.Thread(target=send, args=(msg_input,))
+    thread2.start()
 
 # main page
 def chat_screen():
@@ -54,17 +57,18 @@ def chat_screen():
     chat_screen.geometry("1000x800")
 
 
-
-    screen = Label(chat_screen,bg="black", fg="green",text="Hello there",anchor=SW)
+    screen = Label(chat_screen,bg="black", fg="green",text="",anchor=SW)
     msg_input = Entry(chat_screen)
-    send_message = Button(chat_screen, text="Send",command=lambda: send(msg_input,))
+    send_message = Button(chat_screen, text="Send",command=lambda: test(msg_input,))
+
+    thread1 = threading.Thread(target=display_reviced_text, args=(screen,))
+    thread1.start()
 
     screen.place(x=0, y=0, width=1000, height=750)
     msg_input.place(x=0, y=750, width=950, height=50)
     send_message.place(x=950, y=750, width=50, height=50)
 
-    thread1 = threading.Thread(target=display_reviced_text, args=(screen,))
-    thread1.start()
+
 
     chat_screen.mainloop()
 
