@@ -48,12 +48,9 @@ def send_all(ip):
 
     ##finds messages for deletion
     for x in g_msg_ip[:]:
-        ##mesages that user has sent them selfs they also get mark as seen
-        if x == ip:
-            msg_delete.append(l_msg[i])
-            g_recived_msg[g_msg_ip.index(x)].append(ip)
+
         ##the messages the user has already seen
-        elif ip in g_recived_msg[i]:
+        if ip in g_recived_msg[i]:
             msg_delete.append(l_msg[i])
         ##deletes
         else:
@@ -85,9 +82,9 @@ def handle_client(conn, addr):
             g_msg_ip.append(addr[0])
 
             ##deal with send other users messagea
-            print(g_msg)
-            print(g_msg_ip)
-            print(g_recived_msg)
+            # print(g_msg)
+            # print(g_msg_ip)
+            # print(g_recived_msg)
 
 
             ##deals with user disconnecting
@@ -95,11 +92,11 @@ def handle_client(conn, addr):
                 connected_devices.remove(addr[0])
                 print(connected_devices)
                 connected = False
+
             for x in send_all(addr[0]):
                 conn.send(x.encode(FORMAT))
-            ##remove_seen_msg()
-            ##print(f"[{addr}] {msg}")
-            ##conn.send("Msg received".encode(FORMAT))
+            remove_seen_msg()
+            #print(f"[{addr}] {msg}")
 
     conn.close()
 

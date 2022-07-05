@@ -4,9 +4,9 @@ import socket
 import threading
 
 
+
 HEADER = 64
 PORT = 5050
-##SERVER = "127.0.1.1"
 SERVER = "192.168.1.165"
 FORMAT = "utf-8"
 DISCONNET_MESSAGE = "!DISCONNECT"
@@ -26,7 +26,7 @@ login_info = Read_To_Txt(userinfo)
 main_menu = False
 
 def recivce():
-    print(client.recv(20480).decode(FORMAT))
+    print()
 
 def send(message_box):
     msg = message_box.get()
@@ -38,6 +38,13 @@ def send(message_box):
     client.send(message)
     message_box.delete(0, END)
 
+def display_reviced_text(screen):
+    chat_list = []
+    while True:
+        chat_list.append(client.recv(20480).decode(FORMAT)+ "\n")
+        if len(chat_list)>42:
+            chat_list.pop(1)
+        screen.config(text=" ".join(chat_list))
 
 
 # main page
@@ -46,7 +53,9 @@ def chat_screen():
     chat_screen.title("Chat Screen")
     chat_screen.geometry("1000x800")
 
-    screen = Label(chat_screen,bg="black")
+
+
+    screen = Label(chat_screen,bg="black", fg="green",text="Hello there",anchor=SW)
     msg_input = Entry(chat_screen)
     send_message = Button(chat_screen, text="Send",command=lambda: send(msg_input,))
 
@@ -54,12 +63,14 @@ def chat_screen():
     msg_input.place(x=0, y=750, width=950, height=50)
     send_message.place(x=950, y=750, width=50, height=50)
 
+    thread1 = threading.Thread(target=display_reviced_text, args=(screen,))
+    thread1.start()
+
     chat_screen.mainloop()
 
 
 # delets login page and opens main page
 def enter_button():
-
     if Login_Checker(username_entry, password_entry, login_info, ):
         root.destroy()
         chat_screen()
