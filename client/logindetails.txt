@@ -1,2 +1,0 @@
-root,kaden,jenny,sam,Emma
-toor,Password123,Password123,Password123,Password
